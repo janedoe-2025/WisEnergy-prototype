@@ -1,13 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Gauge, Zap, DollarSign } from "lucide-react";
+import { Gauge, Zap, DollarSign, ChevronRight } from "lucide-react";
+import ConsumptionDetail from "./ConsumptionDetail";
 
 interface ConsumptionOverviewProps {
   currentPower?: number;
   dailyConsumption?: number;
   estimatedCost?: number;
   maxPower?: number;
+  onViewDetails?: () => void;
 }
 
 const ConsumptionOverview = ({
@@ -15,7 +17,10 @@ const ConsumptionOverview = ({
   dailyConsumption = 18.7,
   estimatedCost = 156.32,
   maxPower = 5,
+  onViewDetails,
 }: ConsumptionOverviewProps) => {
+  const [showDetails, setShowDetails] = useState(false);
+
   // Calculate percentage for gauge visualization
   const powerPercentage = Math.min(
     Math.round((currentPower / maxPower) * 100),
@@ -29,12 +34,36 @@ const ConsumptionOverview = ({
     return "text-red-500";
   };
 
+  const handleCardClick = () => {
+    if (onViewDetails) {
+      onViewDetails();
+    } else {
+      setShowDetails(true);
+    }
+  };
+
+  if (showDetails) {
+    return (
+      <ConsumptionDetail
+        onBack={() => setShowDetails(false)}
+        currentPower={currentPower}
+        dailyConsumption={dailyConsumption}
+      />
+    );
+  }
+
   return (
-    <Card className="w-full bg-white shadow-md">
-      <CardHeader className="pb-2">
+    <Card
+      className="w-full bg-white shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+      onClick={handleCardClick}
+    >
+      <CardHeader className="pb-2 flex flex-row items-center justify-between">
         <CardTitle className="text-xl font-semibold text-gray-800">
           Real-Time Consumption
         </CardTitle>
+        <div className="flex items-center text-sm text-blue-600 font-medium">
+          View Details <ChevronRight className="h-4 w-4 ml-1" />
+        </div>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
